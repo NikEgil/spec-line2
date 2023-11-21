@@ -21,3 +21,12 @@ for i in range(len(li)):
 
         plt.plot(x, li[i], label=label)
         # plt.plot(x, li[i], label=current_folder_path)
+
+
+with open("data.txt", "w") as file:
+    for line in range(len(data)):
+        print(data[line])
+        for i in range(4):
+            file.write(str(data[line][i]) + "\t")
+        file.write("\n")
+    file.close()

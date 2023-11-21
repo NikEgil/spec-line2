@@ -5,6 +5,7 @@ import os
 from scipy import signal
 import time
 import re
+from openpyxl import Workbook
 from pylab import *
 
 
@@ -80,8 +81,10 @@ color_list = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(len(folders_
 
 start_time = time.time()
 
-
+data = np.zeros((len(folders_list) + 1, 4), dtype="object")
+data[0] = ["имя", "пик, нм", "интентс", "ширина"]
 # len(folders_list)
+p = 1
 for folder in range(len(folders_list)):
     current_folder_path = main_folder + "/" + folders_list[folder] + "/"
     current_folder = folders_list[folder]
@@ -114,22 +117,28 @@ for folder in range(len(folders_list)):
     cor = cord(masd)
     a = np.arange(cor[0], cor[1])
 
-    index_max = round(x[np.argmax(masd)], 2)
-    index_max_min = round(maxd / np.mean(masd[c1:c2]), 2)
-    weight = round(cor[1] - cor[0], 2)
+    index_max = x[np.argmax(masd)]
+    index_max_min = maxd / np.mean(masd[c1:c2])
+    weight = cor[1] - cor[0]
     color = color_list[folder]
     label = (
         current_folder
         + " "
         + str(nfiles)
         + "%\n"
-        + str(index_max)
+        + str(round(index_max, 2))
         + "нм "
-        + str(index_max_min)
+        + str(round(index_max_min, 2))
         + " "
-        + str(weight)
+        + str(round(weight, 2))
         + "нм"
     )
+
+    data[p][0] = current_folder
+    data[p][1] = index_max
+    data[p][2] = index_max_min
+    data[p][3] = weight
+    p += 1
 
     ax.plot(
         x,
@@ -146,6 +155,17 @@ for folder in range(len(folders_list)):
 
 
 print("Elapsed time: ", time.time() - start_time)
+
+
+wb = Workbook()
+ws = wb.active
+
+for r_num, row in enumerate(data, start=1):
+    for c_num, value in enumerate(row, start=1):
+        ws.cell(row=r_num, column=c_num).value = value
+
+wb.save("output.xlsx")
+
 
 plt.ioff()
 plt.show()
