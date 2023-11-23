@@ -6,7 +6,7 @@ import statistics as st
 from scipy import signal
 import re
 
-path_folder = r"C:\Users\Nik\Desktop\prog\только rmr\20"
+path_folder = r"C:\Users\Nik\Desktop\prog\только rmr\17"
 path_folder = path_folder.replace(chr(92), "/") + "/"
 
 size = 1  # кол-во графиков
@@ -38,8 +38,6 @@ def car(path_folder, s):
         spec = open(str(path_folder + file_list[i]), "r", encoding="utf8")
         spec = spec.read()
         spec = re.split(",", spec)
-        for k in range(20):
-            print(k, spec[k])
         for j in range(start_point, end_point):
             y[j - start_point] = float(spec[j + 11])
         # z = exponential_smoothing(y,alpha)
@@ -48,7 +46,7 @@ def car(path_folder, s):
         plt.plot(x, z, label="s " + file_list[i], color="darkorange", linewidth=1)
         mean = np.mean(z[len(z) - 150 : len(z)])
         plt.plot(x, z - mean, label="d " + file_list[i], color="green", linewidth=1)
-
+    plt.ylim([-0.01, 0.3])
     plt.legend(loc=1, title=round(alpha, 4))
     plt.show()
 

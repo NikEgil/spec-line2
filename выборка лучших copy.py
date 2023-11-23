@@ -1,4 +1,6 @@
+from matplotlib import cm
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import sys
 import os
@@ -47,23 +49,31 @@ def get_rmr(spec):
 
 def create():
     li = list()
-    for i in range(19):
+    for i in range(24):
         li.append(np.zeros((1, len_y)))
     return li
 
 
 step = 0.0125
+cmap = cm.get_cmap("winter", 24)
+color_list1 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
+cmap = cm.get_cmap("turbo", 24)
+color_list2 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
 
 
-def car(current_folder_path, s, method):
+def car(current_folder_path, method, s):
     global n
     file_list = np.array(os.listdir(current_folder_path))
     li = create()
+    color = color_list2
+    if s == 0:
+        color = color_list1
     for file in range(len(file_list)):
         spec = open(current_folder_path + file_list[file], "r", encoding="utf8")
         y = get_rmr(spec.read())
-        # mins = np.mean(y[start_mean_point:end_mean_point])
-        # y -= mins
+        if s == 0:
+            mins = np.mean(y[start_mean_point:end_mean_point])
+            y -= mins
 
         if method == 0:
             delta = np.mean(y[start_max_point : start_max_point + 50])
@@ -75,10 +85,11 @@ def car(current_folder_path, s, method):
             delta = np.mean(y[maxs - 50 : maxs + 50])
         if method == 3:
             delta = np.max(y)
-        for k in range(19):
+        for k in range(24):
             if step * k <= delta < step * (k + 1):
                 li[k] = np.append(li[k], [y], axis=0)
     k = 0
+
     for i in range(len(li)):
         a = len(li[i]) - 1
         if a > 0:
@@ -86,9 +97,14 @@ def car(current_folder_path, s, method):
             li[i] = np.divide(li[i], a)
             li[i] = signal.savgol_filter(li[i], 60, 3)
             # plt.plot(x, li[i], label=str(i) + " " + str(a))
-            plt.plot(x, li[i], label=current_folder_path)
-
-    plt.legend(title=str(method))
+            plt.plot(x, li[i], color=color[i], label=a)
+    plt.ylim(-0.01, 0.3)
+    plt.legend(
+        title=current_folder_path[-3:] + str(method),
+        bbox_to_anchor=(1.01, 1),
+        loc="upper left",
+        borderaxespad=0.0,
+    )
     plt.show()
 
 
@@ -99,15 +115,24 @@ def exponential_smoothing(series, alpha):
     return result
 
 
+sp = 0
+
+
 def on_press(event):
     print("press", event.key)
     sys.stdout.flush()
     global s
-    global size
+    global sp
     global method
+    current_folder_path = main_folder + "/" + folders_list[s] + "/"
     if event.key == "1":
-        plt.cla()
-        plt.clf()
+        method += 1
+        if method > 3:
+            method = 2
+    if event.key == "2":
+        method -= 1
+        if method < 0:
+            method = 0
     if event.key == "right":
         s = s + 1
 
@@ -115,16 +140,23 @@ def on_press(event):
         s = s - 1
 
     if event.key == "up":
-        method += 1
-        if method > 3:
-            method = 3
+        sp += 1
+        if sp > 2:
+            sp = 2
+
     if event.key == "down":
-        method -= 1
-        if method < 0:
-            method = 0
+        sp -= 1
+        if sp < 0:
+            sp = 0
+
+    plt.cla()
+    plt.clf()
+    if sp == 2:
+        car(current_folder_path, method, 1)
+        car(current_folder_path, method, 0)
+    else:
+        car(current_folder_path, method, sp)
     print(s, method)
-    current_folder_path = main_folder + "/" + folders_list[s] + "/"
-    car(current_folder_path, s, method)
 
 
 file_list = []

@@ -60,7 +60,7 @@ n = 0
 def ploting(a, b, t):
     ax.cla()
 
-    b = signal.savgol_filter(b, 50, 3)
+    # b = signal.savgol_filter(b, 50, 3)
 
     ax.plot(
         a,
@@ -71,7 +71,7 @@ def ploting(a, b, t):
         # color=[  0.2,4 / 1 / (len(ax.get_lines()) + 5),1 - 1 / (len(ax.get_lines()) + 1),],
     )
     ax.legend()
-    plt.ylim([-0.01, 0.2])
+    plt.ylim([-0.01, 0.3])
     fig.canvas.draw()
     fig.canvas.flush_events()
 
@@ -99,13 +99,13 @@ for folder in range(len(folders_list)):
             spec = open(current_folder_path + file_list[file], "r", encoding="utf8")
             spec = spec.read()
             y = get_rmr(spec)
-            z = y - np.mean(y[start_mean_point:end_mean_point])
-
-            if np.max(z) > crit:
-                ploting(x, z, t)
-                q += 1
-            if q > 100:
-                break
+            ploting(x, y, t)
+        #  z = y - np.mean(y[start_mean_point:end_mean_point])
+        # if np.max(z) > crit:
+        #      ploting(x, z, t)
+        #      q += 1
+        #  if q > 100:
+        #     break
 
     elif file_list[0][-1] == "t":
         for file in range(len(file_list)):
@@ -119,8 +119,8 @@ for folder in range(len(folders_list)):
                 q += 1
             if q > 100:
                 break
-    if q > 100:
-        continue
+#   if q > 100:
+#  continue
 
 
 print("Elapsed time: ", time.time() - start_time)
