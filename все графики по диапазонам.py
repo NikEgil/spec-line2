@@ -49,15 +49,15 @@ def get_rmr(spec):
 
 def create():
     li = list()
-    for i in range(24):
+    for i in range(30):
         li.append(np.zeros((1, len_y)))
     return li
 
 
-step = 0.0125
-cmap = cm.get_cmap("winter", 24)
+step = 0.01
+cmap = cm.get_cmap("winter", 30)
 color_list1 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
-cmap = cm.get_cmap("turbo", 24)
+cmap = cm.get_cmap("turbo", 30)
 color_list2 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
 
 
@@ -85,7 +85,7 @@ def car(current_folder_path, method, s):
             delta = np.mean(y[maxs - 50 : maxs + 50])
         if method == 3:
             delta = np.max(y)
-        for k in range(24):
+        for k in range(30):
             if step * k <= delta < step * (k + 1):
                 li[k] = np.append(li[k], [y], axis=0)
     k = 0
@@ -93,11 +93,14 @@ def car(current_folder_path, method, s):
     for i in range(len(li)):
         a = len(li[i]) - 1
         if a > 0:
-            li[i] = np.sum(li[i], axis=0)
-            li[i] = np.divide(li[i], a)
-            li[i] = signal.savgol_filter(li[i], 60, 3)
-            # plt.plot(x, li[i], label=str(i) + " " + str(a))
-            plt.plot(x, li[i], color=color[i], label=a)
+            # li[i] = np.sum(li[i], axis=0)
+            # li[i] = np.divide(li[i], a)
+            # li[i] = signal.savgol_filter(li[i], 60, 3)
+            # plt.plot(x, li[i], color=color[i], alpha=0.5, label=a)
+            for j in range(len(li[i])):
+                # plt.plot(x, li[i], label=str(i) + " " + str(a))
+                y = signal.savgol_filter(li[i][j], 60, 3)
+                plt.plot(x, y, color=color[i], alpha=0.1)
     plt.ylim(-0.01, 0.3)
     plt.legend(
         title=current_folder_path[-3:] + str(method),

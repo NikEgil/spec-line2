@@ -20,7 +20,7 @@ folders_list = np.array(folders_list, dtype=str)
 crit = 0.1
 # 153 884    измеряемый диапазон. 0-2136 диапазон данных
 start = 400  # нм
-end = 700  # нм
+end = 884  # нм
 
 step = (884 - 153) / 2134
 
@@ -41,6 +41,7 @@ x = np.arange(start + step, end, step)
 def get_rmr(spec):
     spec = re.split(",", spec)
     for j in range(start_point, end_point):
+        print(j)
         y[j - start_point] = float(spec[j + 11])
     return y
 
@@ -60,7 +61,7 @@ n = 0
 def ploting(a, b, t):
     ax.cla()
 
-    # b = signal.savgol_filter(b, 50, 3)
+    b = signal.savgol_filter(b, 50, 3)
 
     ax.plot(
         a,
@@ -100,12 +101,12 @@ for folder in range(len(folders_list)):
             spec = spec.read()
             y = get_rmr(spec)
             ploting(x, y, t)
-        #  z = y - np.mean(y[start_mean_point:end_mean_point])
-        # if np.max(z) > crit:
-        #      ploting(x, z, t)
-        #      q += 1
-        #  if q > 100:
-        #     break
+            #  z = y - np.mean(y[start_mean_point:end_mean_point])
+            # if np.max(z) > crit:
+            #      ploting(x, z, t)
+            q += 1
+            if q > 100:
+                break
 
     elif file_list[0][-1] == "t":
         for file in range(len(file_list)):

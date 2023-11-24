@@ -47,12 +47,12 @@ def get_rmr(spec):
 
 def create():
     li = list()
-    for i in range(19):
+    for i in range(30):
         li.append(np.zeros((1, len_y)))
     return li
 
 
-step = 0.0125
+step = 0.01
 c1 = round((400 - start) / step_v)
 c2 = round((420 - start) / step_v)
 print(c1, "aaa", c2, len_y)
@@ -65,8 +65,8 @@ def car(current_folder_path, s, method):
     for file in range(len(file_list)):
         spec = open(current_folder_path + file_list[file], "r", encoding="utf8")
         y = get_rmr(spec.read())
-        mins = np.mean(y[start_mean_point:end_mean_point])
-        y -= mins
+        # mins = np.mean(y[start_mean_point:end_mean_point])
+        # y -= mins
 
         if method == 0:
             delta = np.mean(y[start_max_point : start_max_point + 50])
@@ -78,7 +78,7 @@ def car(current_folder_path, s, method):
             delta = np.mean(y[maxs - 50 : maxs + 50])
         if method == 3:
             delta = np.max(y)
-        for k in range(19):
+        for k in range(30):
             if step * k <= delta < step * (k + 1):
                 li[k] = np.append(li[k], [y], axis=0)
     k = 0
@@ -95,7 +95,7 @@ def car(current_folder_path, s, method):
                 str(round((i) * step, 4))
                 + "-"
                 + str(round((i + 1) * step, 4))
-                + "\n"
+                + " "
                 + str(round(a / len(file_list) * 100, 2))
                 + "% "
                 + str(round(lmax, 2))
@@ -106,7 +106,7 @@ def car(current_folder_path, s, method):
             plt.plot(x, li[i], label=label)
             # plt.plot(x, li[i], label=current_folder_path)
 
-    plt.legend(title=str(method))
+    plt.legend(title=current_folder_path[-3:] + str(method))
     plt.show()
 
 
