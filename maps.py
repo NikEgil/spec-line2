@@ -10,7 +10,7 @@ from pylab import *
 from openpyxl import load_workbook
 
 
-filename = "output.xlsx"
+filename = "output_c.xlsx"
 # имя	пик, нм	интентс	ширина,нм	АК	ЦН	ХЗ	ВМ
 workbook = load_workbook(filename=filename)
 sheet = workbook.active
@@ -44,7 +44,7 @@ def graf(pos, x, y, z, ids, n):
     ax = fig.add_subplot(pos)
     zs = np.sort(z)
     c = 0
-    cmap = cm.get_cmap("gnuplot", len(np.unique(z)))
+    cmap = cm.get_cmap("rainbow", len(np.unique(z)))
     color_list = [
         matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(len(np.unique(z)))
     ]
@@ -92,28 +92,4 @@ if s > 300:
     graf(s + 1, peak, inten, v_3, id, ("положение пика,нм", "I(max)/I(min)", "v3"))
     graf(s + 2, peak, weight, v_3, id, ("положение пика,нм", "ширина,нм", "v3"))
     graf(s + 3, weight, inten, v_3, id, ("ширина,нм", "I(max)/I(min)", "v3"))
-plt.show()
-
-fig = plt.figure(figsize=(14, 4))
-ax = fig.add_subplot(131)
-for i in range(len(id)):
-    ax.scatter(speed[i], peak[i], color=color_list[i])
-    ax.text(speed[i], peak[i], id[i])
-    ax.set_xlabel("общая скорость")
-    ax.set_ylabel(name[1])
-
-ax = fig.add_subplot(132)
-for i in range(len(id)):
-    ax.scatter(speed[i], weight[i], color=color_list[i])
-    ax.text(speed[i], weight[i], id[i])
-    ax.set_xlabel("общая скорость")
-    ax.set_ylabel(name[2])
-
-ax = fig.add_subplot(133)
-for i in range(len(id)):
-    ax.scatter(speed[i], weight[i], label=id[i], color=color_list[i])
-    ax.text(speed[i], weight[i], id[i])
-    ax.set_xlabel("общая скорость")
-    ax.set_ylabel(name[3])
-ax.legend(bbox_to_anchor=(1.01, 1), loc="upper left", borderaxespad=0.0)
 plt.show()

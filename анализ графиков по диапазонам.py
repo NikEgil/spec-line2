@@ -69,10 +69,11 @@ def car(current_folder_path, s, method):
         # y -= mins
 
         if method == 0:
-            delta = np.mean(y[start_max_point : start_max_point + 50])
-        if method == 1:
-            maxs = np.argmax(y)
+            maxs = np.argmax(y[0 : round(len_y / 2)])
             delta = np.mean(y[maxs - 50 : maxs + 50])
+        if method == 1:
+            maxs = np.argmax(y[0 : round(len_y / 2)])
+            delta = np.mean(y[len_y - 50 : len_y])
         if method == 2:
             maxs = np.argmax(y[0 : round(len_y / 2)])
             delta = np.mean(y[maxs - 50 : maxs + 50])

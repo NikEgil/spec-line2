@@ -12,8 +12,8 @@ path_folder = path_folder.replace(chr(92), "/") + "/"
 size = 1  # кол-во графиков
 s = 0  # начальный файл
 # 153 884    измеряемый диапазон. 0-2136 диапазон данных
-start = 450  # нм
-end = 650  # нм
+start = 153  # нм
+end = 884  # нм
 step = (884 - 153) / 2134
 
 start_point = round((start - 153) / step)
@@ -42,10 +42,11 @@ def car(path_folder, s):
             y[j - start_point] = float(spec[j + 11])
         # z = exponential_smoothing(y,alpha)
         z = signal.savgol_filter(y, 51, 3)
-        plt.plot(x, y, label=file_list[i], color="royalblue", linewidth=1)
+        plt.plot(x, y, label=file_list[i], color="royalblue", alpha=0.2, linewidth=1)
         plt.plot(x, z, label="s " + file_list[i], color="darkorange", linewidth=1)
-        mean = np.mean(z[len(z) - 150 : len(z)])
-        plt.plot(x, z - mean, label="d " + file_list[i], color="green", linewidth=1)
+        mean = np.mean(y[len(z) - 300 : len(z)])
+    # st = z[len(z) - 50]
+    # plt.plot(x, z - st, label="d " + file_list[i], color="green", linewidth=1)
     plt.ylim([-0.01, 0.3])
     plt.legend(loc=1, title=round(alpha, 4))
     plt.show()

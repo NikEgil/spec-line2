@@ -3,17 +3,17 @@ import numpy as np
 import sys
 import os
 import statistics as st
-from scipy import signal
+import scipy.fft as fft
 import re
 
-path_folder = r"C:\Users\Nik\Desktop\prog\data2\15"
+path_folder = r"C:\Users\Nik\Desktop\prog\только rmr\17"
 path_folder = path_folder.replace(chr(92), "/") + "/"
 
 size = 1  # кол-во графиков
 s = 0  # начальный файл
 # 153 884    измеряемый диапазон. 0-2136 диапазон данных
-start = 450  # нм
-end = 650  # нм
+start = 153  # нм
+end = 884  # нм
 step = (884 - 153) / 2134
 
 start_point = round((start - 153) / step)
@@ -30,7 +30,7 @@ fig, ax = plt.subplots(figsize=[10, 10])
 
 def car(path_folder, s):
     global n
-
+    N = len(y)
     for i in range(s, s + size):
         print(s)
         file_list = np.array(os.listdir(path_folder))
@@ -38,16 +38,12 @@ def car(path_folder, s):
         spec = open(str(path_folder + file_list[i]), "r", encoding="utf8")
         spec = spec.read()
         spec = re.split(",", spec)
-
         for j in range(start_point, end_point):
             y[j - start_point] = float(spec[j + 11])
         # z = exponential_smoothing(y,alpha)
-        #  z = signal.savgol_filter(y, 51, 3)
-        plt.plot(x, y, label=file_list[i], color="royalblue", linewidth=1)
-        # plt.plot(x, z, label="s " + file_list[i], color="darkorange", linewidth=1)
-        # mean = np.mean(z[len(z) - 150 : len(z)])
-        # plt.plot(x, z - mean, label="d " + file_list[i], color="green", linewidth=1)
-
+        Yx = np.abs(fft.fft(y))
+        Xx = fft.fftfreq(len(y), 1 / 10000)
+        plt.plot(Xx[1 : int(N / 2)], Yx[1 : int(N / 2)])
     plt.legend(loc=1, title=round(alpha, 4))
     plt.show()
 
@@ -75,10 +71,6 @@ def on_press(event):
         s = s - size
         if s > n - size:
             s = 0
-    if event.key == "5":
-        s = 100
-        for o in range(100):
-            car(path_folder, o)
     if event.key == "up":
         size += 1
     if event.key == "down":
@@ -91,7 +83,7 @@ def on_press(event):
     if event.key == "2":
         alpha -= 0.002
         print(alpha)
-    # car(path_folder, s)
+    car(path_folder, s)
 
 
 fig.canvas.mpl_connect("key_press_event", on_press)

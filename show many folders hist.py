@@ -6,7 +6,7 @@ from scipy import signal
 import time
 import re
 from pylab import *
-
+import seaborn as sns
 
 main_folder = r"C:\Users\Nik\Desktop\prog\только rmr"
 main_folder = main_folder.replace(chr(92), "/")
@@ -59,10 +59,11 @@ color_list = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(cmap.N)]
 
 start_time = time.time()
 
-steps = 0.01025
+steps = 0.01
 # len(folders_list)
-bins1 = np.arange(0, 0.2, steps)
+bins1 = np.arange(0, 0.3, steps)
 bins2 = np.arange(0, 0.2 - steps, steps) + steps / 2
+c1 = round((400 - start) / step)
 for folder in range(len(folders_list)):
     current_folder_path = main_folder + "/" + folders_list[folder] + "/"
     current_folder = folders_list[folder]
@@ -73,22 +74,24 @@ for folder in range(len(folders_list)):
     for file in range(len(file_list)):
         spec = open(current_folder_path + file_list[file], "r", encoding="utf8")
         y = get_rmr(spec.read())
+
         # дельта с предпологаемой областью
-        a = np.mean(y[start_max_point : start_max_point + 100]) - np.mean(
-            y[start_mean_point:end_mean_point]
-        )
+        # a = np.mean(y[start_max_point : start_max_point + 100]) - np.mean(
+        #     y[start_mean_point:end_mean_point]
+        #  )
         # дельта с максимумом
         # a = np.max(y) - np.mean(y[start_mean_point:end_mean_point])
-        mas = np.append(mas, a)
-    hist, bins = np.histogram(mas, bins1)
-    maxs = np.max(hist)
-    mins = np.min(hist)
-    scaled_data = (hist - mins) / (maxs - mins)
+        mas = np.append(mas, np.max(y))
+    sns.histplot(data=mas, bins=bins1, kde=True)
+# hist, bins = np.histogram(mas, bins1)
+# maxs = np.max(hist)
+# mins = np.min(hist)
+# scaled_data = (hist - mins) / (maxs - mins)
 
-    plt.plot(
-        bins2, scaled_data, color=color_list[len(ax.get_lines())], label=current_folder
-    )
-    plt.legend()
+#  plt.plot(
+#      bins2, scaled_data, color=color_list[len(ax.get_lines())], label=current_folder
+#  )
+#  plt.legend()
 
 print("Elapsed time: ", time.time() - start_time)
 

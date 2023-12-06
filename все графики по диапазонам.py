@@ -56,9 +56,9 @@ def create():
 
 step = 0.01
 cmap = cm.get_cmap("winter", 30)
-color_list1 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
+color_list1 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(30)]
 cmap = cm.get_cmap("turbo", 30)
-color_list2 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(24)]
+color_list2 = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(30)]
 
 
 def car(current_folder_path, method, s):
@@ -108,6 +108,8 @@ def car(current_folder_path, method, s):
         loc="upper left",
         borderaxespad=0.0,
     )
+    plt.xlabel("Длина волны, нм")
+    plt.ylabel("Интенсивность, отн.ед")
     plt.show()
 
 
@@ -151,7 +153,8 @@ def on_press(event):
         sp -= 1
         if sp < 0:
             sp = 0
-
+    if event.key == "5":
+        plt.savefig(current_folder_path[-3:] + ".png")
     plt.cla()
     plt.clf()
     if sp == 2:

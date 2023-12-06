@@ -1,4 +1,6 @@
+from matplotlib import cm
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import sys
 import os
@@ -47,12 +49,14 @@ def get_rmr(spec):
 
 def create():
     li = list()
-    for i in range(19):
+    for i in range(30):
         li.append(np.zeros((1, len_y)))
     return li
 
 
-step = 0.0125
+step = 0.01
+cmap = cm.get_cmap("turbo", 30)
+color = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(30)]
 
 
 def car(current_folder_path, s, method):
@@ -75,7 +79,7 @@ def car(current_folder_path, s, method):
             delta = np.mean(y[maxs - 50 : maxs + 50])
         if method == 3:
             delta = np.max(y)
-        for k in range(19):
+        for k in range(30):
             if step * k <= delta < step * (k + 1):
                 li[k] = np.append(li[k], [y], axis=0)
     k = 0
@@ -86,9 +90,14 @@ def car(current_folder_path, s, method):
             li[i] = np.divide(li[i], a)
             li[i] = signal.savgol_filter(li[i], 60, 3)
             # plt.plot(x, li[i], label=str(i) + " " + str(a))
-            plt.plot(x, li[i], label=current_folder_path)
+            plt.plot(
+                x,
+                li[i],
+                color=color[i],
+                label=str(round(i * step, 3)) + "-" + str(round((i + 1) * step, 3)),
+            )
 
-    plt.legend(title=str(method))
+    plt.legend(title=str(current_folder_path[-3:]))
     plt.show()
 
 

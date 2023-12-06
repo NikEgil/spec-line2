@@ -73,6 +73,7 @@ def cord(mas):
 
 c1 = round((400 - start) / step)
 c2 = round((420 - start) / step)
+mean_point = round((650 - start) / step)
 plt.ion()
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -103,6 +104,7 @@ for folder in range(len(folders_list)):
         delta = np.mean(y[maxs - 50 : maxs + 50])
         if delta > delta_m:
             delta_m = delta
+        y += mins
         mas[file] = y
     for i in range(len(mas)):
         delta = np.mean(mas[i][maxs - 50 : maxs + 50])
@@ -122,16 +124,17 @@ for folder in range(len(folders_list)):
     weight = cor[1] - cor[0]
     color = color_list[folder]
     label = (
-        current_folder
+        "синтез №"
+        + current_folder
         + " "
-        + str(nfiles)
-        + "%\n"
+        #  + str(nfiles)
+        + "\n"
         + str(round(index_max, 2))
         + "нм "
         + str(round(index_max_min, 2))
         + " "
-        + str(round(weight, 2))
-        + "нм"
+        # + str(round(weight, 2))
+        #  + "нм"
     )
 
     data[p][0] = current_folder
@@ -147,11 +150,18 @@ for folder in range(len(folders_list)):
         label=label,
         color=color,
     )
-    ax.plot(a, np.ones(len(a)) * maxd * 0.75, linestyle="dashed", color=color)
+    # ax.plot(a, np.ones(len(a)) * maxd * 0.75, linestyle="dashed", color=color)
     ax.legend()
     # bbox_to_anchor=(1.01, 1), loc="upper left", borderaxespad=0.0
     fig.canvas.draw()
     fig.canvas.flush_events()
+    plt.legend(
+        #  bbox_to_anchor=(1.01, 1),
+        loc="upper right",
+        borderaxespad=0.0,
+    )
+    plt.xlabel("Длина волны, нм")
+    plt.ylabel("Интенсивность, отн.ед")
 
 
 print("Elapsed time: ", time.time() - start_time)
