@@ -11,10 +11,8 @@ import re
 main_folder = r"C:\Users\Nik\Desktop\prog\только rmr"
 main_folder = main_folder.replace(chr(92), "/")
 print(main_folder)
-folders_list = np.array(os.listdir(main_folder), dtype=int)
-folders_list = np.sort(folders_list)
-print(folders_list)
-folders_list = np.array(folders_list, dtype=str)
+folders_list = np.array(os.listdir(main_folder))
+
 
 # region переменные
 crit = 0.1
@@ -23,12 +21,13 @@ start = 400  # нм
 end = 700  # нм
 mean = 650
 min = 420
+lamp = 565
 step = (884 - 153) / 2134
 start_point = round((start - 153) / step)
 end_point = start_point + int((end - start) / step)
 
 len_y = end_point - start_point
-
+lamp_point = round((lamp - start) / step)
 mean_point = round((mean - start) / step)
 min_point = round((min - start) / step)
 y = np.zeros(len_y)
@@ -153,7 +152,7 @@ def m3(mas):
     for i in range(len(m)):
         if np.max(m[i]) >= maxs:
             li = np.append(li, [m[i]], axis=0)
-    printer(li, "blue", "3", 0.2)
+    # printer(li, "blue", "3", 0.2)
 
 
 def sm(ar):
@@ -173,20 +172,27 @@ def sm(ar):
 
 def peak(ar):
     maxs = np.max(ar)
-    y = np.arange(0, maxs, 0.001)
+    y1 = np.arange(0, maxs, 0.001)
     i1 = ar[min_point]
     imax = x[np.argmax(ar)]
     intens = np.max(ar) / i1
     ind3 = int(imax)
-    print(min_point, i1, ind3)
+    ylam = ar[lamp_point]
+    y2 = np.arange(0, ylam, 0.001)
     while ar[ind3] > i1:
         ind3 += 1
         print(ind3)
-    print(min_point, i1, ind3)
     plt.plot(
-        np.ones(len(y)) * imax,
-        y,
+        np.ones(len(y1)) * imax,
+        y1,
         color="gray",
+        alpha=1,
+        label="пик:" + str(round(ind3, 2)) + "нм " + "инт:" + str(round(intens, 2)),
+    )
+    plt.plot(
+        np.ones(len(y2)) * x[lamp_point],
+        y2,
+        color="red",
         alpha=1,
         label="пик:" + str(round(ind3, 2)) + "нм " + "инт:" + str(round(intens, 2)),
     )
