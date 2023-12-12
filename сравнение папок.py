@@ -11,13 +11,16 @@ from openpyxl import Workbook
 from pylab import *
 from openpyxl import load_workbook
 
-main_folder = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-2"
-base_folder = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-2\base"
+main_folder1 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-1"
+main_folder2 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-2"
+main_folder3 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-3"
+base_folder1 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-1\base"
+base_folder2 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-2\base"
+base_folder3 = r"C:\Users\Nik\Desktop\prog\08-12-2023_Zagrebaev_Au_NPs\T=20\1-3\base"
 need_base = True
-# main_folder = r"C:\Users\Nik\Desktop\prog\Новая папка"
-main_folder = main_folder.replace(chr(92), "/")
-print(main_folder)
-folders_list = np.array(os.listdir(main_folder))
+
+
+folders_list = np.array(os.listdir(main_folder1))
 
 print(folders_list)
 # folders_list = np.array(folders_list, dtype=str)
@@ -25,8 +28,8 @@ print(folders_list)
 # region переменные
 crit = 0.1
 # 153 884    измеряемый диапазон. 0-2136 диапазон данных
-start = 300  # нм
-end = 800  # нм
+start = 350  # нм
+end = 750  # нм
 step = (884 - 153) / 2134
 start_point = round((start - 153) / step)
 end_point = start_point + int((end - start) / step)
@@ -91,6 +94,11 @@ def get_base(base_folder):
     return b
 
 
+base1 = get_base(base_folder1)
+base2 = get_base(base_folder2)
+base3 = get_base(base_folder3)
+
+
 def calc(mas, base):
     d = base[0]
     l = base[1]
@@ -105,11 +113,13 @@ def calc(mas, base):
     return m
 
 
-def car(current_folder_path):
-    global n
+li = np.zeros((0, len_y))
+
+
+def car(current_folder_path, base):
+    global li
     file_list = np.array(os.listdir(current_folder_path))
     li = np.zeros((0, len_y))
-    color = [matplotlib.colors.rgb2hex(cmap2(i)[:3]) for i in range(len(file_list))]
     if file_list[0][-1] == "n":
         for file in range(len(file_list)):
             with open(
@@ -138,18 +148,41 @@ def car(current_folder_path):
         pass
 
     if need_base == True:
-        li = calc(li, get_base(base_folder))
+        li = calc(li, base)
 
-    for i in range(len(li)):
-        # g= signal.savgol_filter(li[i], 60, 3)
-        plt.plot(x, signal.savgol_filter(li[i], 60, 3), color=color[i], alpha=0.4)
+
+def ploter(mas, color, tex, sm):
+    a = 0
+    if sm == 1:
+        for i in range(len(mas)):
+            spec = signal.savgol_filter(mas[i], 60, 3)
+            if mas[i][400] > 0.05:
+                plt.plot(x, spec, color=color, alpha=0.2)
+                if a == 0:
+                    plt.plot(
+                        x,
+                        spec,
+                        color=color,
+                        alpha=0.2,
+                        label=tex[-15:],
+                    )
+                    a += 1
+    else:
+        for i in range(len(mas)):
+            if mas[i][400] > 0.05:
+                plt.plot(x, mas[i], color=color, alpha=0.2)
+                if a == 0:
+                    plt.plot(
+                        x,
+                        mas[i],
+                        color=color,
+                        alpha=0.2,
+                        label=tex[-15:],
+                    )
+                    a += 1
 
     plt.legend(
-        title=current_folder_path[-10:]
-        + "\n"
-        + str(len(file_list))
-        + " "
-        + str(len(color)),
+        title=tex[-15:],
         bbox_to_anchor=(1.01, 1),
         loc="upper left",
         borderaxespad=0.0,
@@ -159,23 +192,34 @@ def car(current_folder_path):
     plt.show()
 
 
+sm = 0
+
+
 def on_press(event):
     print("press", event.key)
     sys.stdout.flush()
     global s
-    global sp
-    global method
-    current_folder_path = main_folder + "/" + folders_list[s] + "/"
+    global sm
+
     if event.key == "right":
         s = s + 1
-
     if event.key == "left":
         s = s - 1
-    if event.key == "5":
-        plt.savefig(current_folder_path[-3:] + ".png")
+    if event.key == "up":
+        sm = sm + 1
+    if event.key == "down":
+        sm = sm - 1
+    current_folder_path1 = main_folder1 + "/" + folders_list[s] + "/"
+    current_folder_path2 = main_folder2 + "/" + folders_list[s] + "/"
+    current_folder_path3 = main_folder3 + "/" + folders_list[s] + "/"
     plt.cla()
     plt.clf()
-    car(current_folder_path)
+    car(current_folder_path1, base1)
+    ploter(li, "red", current_folder_path1, sm)
+    car(current_folder_path2, base2)
+    ploter(li, "blue", current_folder_path2, sm)
+    car(current_folder_path3, base3)
+    ploter(li, "green", current_folder_path3, sm)
     print(s, method)
 
 

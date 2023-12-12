@@ -96,8 +96,9 @@ def car(current_folder_path, s, method):
                 color=color[i],
                 label=str(round(i * step, 3)) + "-" + str(round((i + 1) * step, 3)),
             )
-
-    plt.legend(title=str(current_folder_path[-3:]))
+    plt.ylabel("Интенсивность, отн.ед.")
+    plt.xlabel("Длина волны, нм")
+    plt.legend(title=str("синтез " + current_folder_path[-3:-1]))
     plt.show()
 
 
@@ -114,9 +115,9 @@ def on_press(event):
     global s
     global size
     global method
-    if event.key == "1":
-        plt.cla()
-        plt.clf()
+
+    plt.cla()
+    plt.clf()
     if event.key == "right":
         s = s + 1
 

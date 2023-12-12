@@ -6,6 +6,7 @@ import statistics as st
 from scipy import stats
 from scipy import signal
 import re
+from sklearn.neighbors import KernelDensity
 
 main_folder = r"C:\Users\Nik\Desktop\prog\только rmr"
 main_folder = main_folder.replace(chr(92), "/")
@@ -75,13 +76,24 @@ def cord(mas):
 
 def hist(mas, ind):
     ar = np.zeros(len(mas))
-    if st == "max":
+    if ind == "max":
         for i in range(len(mas)):
             ar[i] = np.max(mas[i])
     else:
         for i in range(len(mas)):
             ar[i] = mas[i][ind]
     return ar
+
+
+def density(x):
+    dx = x.max() - x.min()
+    if dx == 0:
+        return [x[0] - 1, x[0] - 0.01, x[0], x[0] + 0.01, x[0] + 1], [0, 0, 1, 0, 0]
+    kde_sk = KernelDensity(bandwidth=dx / 50, kernel="gaussian")
+    kde_sk.fit(x.reshape([-1, 1]))
+    eval_points = np.linspace(x.min() - dx * 0.1, x.max() + dx * 0.1, 100)
+    y_sk = np.exp(kde_sk.score_samples(eval_points.reshape(-1, 1)))
+    return eval_points, y_sk
 
 
 def car(current_folder_path, s):
@@ -93,26 +105,32 @@ def car(current_folder_path, s):
     file_list = np.array(os.listdir(current_folder_path))
     mas = np.zeros((len(file_list), len_y))
     for file in range(len(file_list)):
-        spec = open(current_folder_path + file_list[file], "r", encoding="utf8")
-        y = get_rmr(spec.read())
+        with open(current_folder_path + file_list[file], "r", encoding="utf8") as spec:
+            y = get_rmr(spec.read())
+        # mas[file] = signal.savgol_filter(y, 60, 3)
+        # t = signal.savgol_filter(y, 60, 3)
+        # y[[lamp_point, mean_point]] = t[[lamp_point, mean_point]]
         mas[file] = signal.savgol_filter(y, 60, 3)
 
-    plt.suptitle("синтез " + current_folder_path[-3:] + str(len(file_list)) + "шт")
+    plt.suptitle(
+        "скопления, синтез " + current_folder_path[-3:] + str(len(file_list)) + "шт"
+    )
     histplot(mas, 1, "I")
 
     m = np.zeros((len(file_list), len_y))
 
     for i in range(len(mas)):
         m[i] = mas[i] - mas[i][mean_point]
-    histplot(m, 6, "- I(650нм)")
+    histplot(m, 6, "вычитание I(650нм)")
 
     for i in range(len(mas)):
         m[i] = mas[i] - mas[i][lamp_point]
-    histplot(m, 11, "- I(565нм)")
+    histplot(m, 11, "вычитание I(565нм)")
 
     for i in range(len(mas)):
-        m[i] = mas[i] / mas[i][lamp_point]
-    histplot(m, 16, "/ I(565нм)")
+        m[i] = mas[i] - mas[i][mean_point]
+        m[i] = m[i] / m[i][lamp_point]
+    histplot(m, 16, "- I(650нм) / I(565нм)")
 
     plt.show()
 
@@ -126,39 +144,40 @@ def histplot(mas, n, tex):
     h = hist(mas, min_point)
     bins1 = np.arange(np.min(h), np.max(h), np.max(h) / 100)
     bins2 = np.arange(np.min(h), np.max(h) - np.max(h) / 100, np.max(h) / 100)
-    counts, bins = np.histogram(h, bins1)
-    plt.plot(bins2, counts)
+    # counts, bins = np.histogram(h, bins1)
+
+    plt.plot(*density(h))
 
     # гист в max
     plt.subplot(4, 5, n + 1)
     if n == 1:
         plt.title(label="max")
-    h = hist(mas, min_point)
-    counts, bins = np.histogram(h, bins1)
-    plt.plot(bins2, counts)
+    h = hist(mas, "max")
+    # counts, bins = np.histogram(h, bins1)
+    plt.plot(*density(h))
 
     # гист в 565 лампа
     plt.subplot(4, 5, n + 2)
     if n == 1:
         plt.title(label="565нм")
     h = hist(mas, lamp_point)
-    counts, bins = np.histogram(h, bins1)
-    plt.plot(bins2, counts)
+    # counts, bins = np.histogram(h, bins1)
+    plt.plot(*density(h))
 
     # гист в 650
     plt.subplot(4, 5, n + 3)
     if n == 1:
         plt.title(label="650нм")
     h = hist(mas, mean_point)
-    counts, bins = np.histogram(h, bins1)
-    plt.plot(bins2, counts)
+    # counts, bins = np.histogram(h, bins1)
+    plt.plot(*density(h))
 
     plt.subplot(4, 5, n + 4)
     if n == 1:
-        plt.title(label="50 графиков")
-    for i in range(50):
+        plt.title(label="все графики")
+    for i in range(len(mas)):
         # a = signal.savgol_filter(mas[i], 60, 3)
-        plt.plot(x, mas[i], alpha=0.2)
+        plt.plot(x, mas[i], color="black", lw=0.2, alpha=0.1)
 
 
 def on_press(event):
@@ -172,6 +191,8 @@ def on_press(event):
         plt.cla()
         plt.clf()
         plt.show()
+    if event.key == "2":
+        plt.savefig(str(current_folder_path[-3:]))
     if event.key == "right":
         s = s + 1
         car(current_folder_path, s)
@@ -179,6 +200,7 @@ def on_press(event):
         s = s - 1
         car(current_folder_path, s)
     print(s, current_folder_path)
+    plt.savefig(str(current_folder_path[-3:-1]))
 
 
 file_list = []
