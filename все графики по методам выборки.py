@@ -189,13 +189,13 @@ def peak(ar):
         alpha=1,
         label="пик:" + str(round(ind3, 2)) + "нм " + "инт:" + str(round(intens, 2)),
     )
-    plt.plot(
-        np.ones(len(y2)) * x[lamp_point],
-        y2,
-        color="red",
-        alpha=1,
-        label="пик:" + str(round(ind3, 2)) + "нм " + "инт:" + str(round(intens, 2)),
-    )
+    # plt.plot(
+    #      np.ones(len(y2)) * x[lamp_point],
+    #      y2,
+    ##      color="red",
+    #     alpha=1,
+    #     label="пик:" + str(round(ind3, 2)) + "нм " + "инт:" + str(round(intens, 2)),
+    # )
     plt.legend(loc="upper right", borderaxespad=0.0)
 
 
