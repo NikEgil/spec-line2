@@ -41,20 +41,22 @@ def size(mas):
 
 
 def graf(pos, x, y, z, ids, n):
-    ax = fig.add_subplot(pos)
+    ax = fig.add_subplot(pos, projection="3d")
     zs = np.sort(z)
     c = 0
     cmap = cm.get_cmap("rainbow", len(np.unique(z)))
     color_list = [
         matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(len(np.unique(z)))
     ]
+
     print(len(z), len(np.unique(z)), len(color_list))
     for i in range(len(ids)):
         if i == 0 or z[i] != z[i - 1]:
             color = color_list[np.where(z == zs[c])[0][0]]
             c += 1
-        ax.scatter(x[i], y[i], color=color, label=ids[i])
-        ax.text(x[i], y[i], round(z[i], 2))
+        # ax.scatter(x[i], y[i], color=color, label=ids[i])
+        ax.scatter3D(x, y, z)
+        #  ax.text(x[i], y[i], round(z[i], 2))
         ax.set_xlabel(n[0])
         ax.set_ylabel(n[1])
         ax.set_title(n[2])

@@ -8,7 +8,7 @@ data = pd.read_excel("output_c.xlsx")
 
 plotDescriptors2d(
     data,
-    descriptorNames=["v АК", "интентс"],
+    descriptorNames=["v АК", "v ЦН"],
     labelNames=["пик, нм", "ширина"],
     textColumn="имя",
     # unknown="unknown.params",
