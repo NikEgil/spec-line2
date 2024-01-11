@@ -7,7 +7,7 @@ from scipy import signal
 import re
 from natsort import natsorted
 
-path_folder = r"c:\Users\Nik\Desktop\prog\только rmr\29"
+path_folder = r"c:\Users\Nik\Desktop\prog\только rmr\15"
 path_folder = path_folder.replace(chr(92), "/") + "/"
 
 size = 50  # кол-во графиков
