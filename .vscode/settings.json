@@ -1,3 +1,7 @@
 {
-    "notebook.cellFocusIndicator": "border"
+    "notebook.cellFocusIndicator": "border",
+    "notebook.consolidatedOutputButton": false,
+    "notebook.consolidatedRunButton": true,
+    "notebook.formatOnSave.enabled": true,
+    "notebook.output.wordWrap": true
 }
